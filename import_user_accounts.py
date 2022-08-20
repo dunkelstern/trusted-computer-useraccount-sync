@@ -7,8 +7,6 @@ data = json.load(sys.stdin)
 # filter /etc/passwd
 #
 
-print('/etc/passwd')
-
 result = []
 
 with open('/etc/passwd', 'r') as fp:
@@ -20,13 +18,13 @@ with open('/etc/passwd', 'r') as fp:
         
         # only include users with uid >= 1000 and username is not `nobody`
         if int(uid) < 1000 or username == 'nobody':
-            result.append(f'{username}:x:{uid}:{gid}:{description}:{homedir}:{shell}')
+            result.append(f"{username}:x:{uid}:{gid}:{description}:{homedir}:{shell}")
 
 for user in data['passwd']:
-    result.append(f'{user["username"]}:x:{user["uid"]}:{user["gid"]}:{user["description"]}:{user["home"]}:{user["shell"]}')
+    result.append(f"{user['username']}:x:{user['uid']}:{user['gid']}:{user['description']}:{user['home']}:{user['shell']}")
     
 with open('/etc/passwd', 'w') as fp:
-    fp.writelines(result)
+    fp.writelines([r + "\n" for r in result])
 
 known_users = [v['username'] for v in data['passwd']]
 
@@ -45,13 +43,13 @@ with open('/etc/shadow', 'r') as fp:
         
         # only include users with uid >= 1000 and username is not `nobody`
         if username not in known_users:
-            result.append(f'{username}:{password_hash}:{last_change}:{min_days}:{max_days}:{warn_days}:{inactive_days}:{expire}:{flag}')
+            result.append(f"{username}:{password_hash}:{last_change}:{min_days}:{max_days}:{warn_days}:{inactive_days}:{expire}:{flag}")
 
 for user in data['shadow']:
-    result.append(f'{user["username"]}:{user["password"]}:{user["last_change"]}:{user["min_days"]}:{user["max_days"]}:{user["warn_days"]}:{user["inactive"]}:{user["expire"]}:')
+    result.append(f"{user['username']}:{user['password']}:{user['last_change']}:{user['min_days']}:{user['max_days']}:{user['warn_days']}:{user['inactive']}:{user['expire']}:")
 
 with open('/etc/shadow', 'w') as fp:
-    fp.writelines(result)
+    fp.writelines([r + "\n" for r in result])
 
 #
 # filter /etc/group
@@ -78,16 +76,16 @@ with open('/etc/group', 'r') as fp:
 
         # only user groups, not system groups
         if int(gid) < 1000 or groupname == 'nobody':
-            result.append(f'{groupname}:x:{gid}:{",".join(members)}')
+            result.append(f"{groupname}:x:{gid}:{','.join(members)}")
  
 for group in data['groups']:
     members = []
     if group['name'] in data['group_memberships']:
         members = data['group_memberships'][group['name']]
-    result.append(f'{group["name"]}:x:{group["gid"]}:{",".join(members)}')
+    result.append(f"{group['name']}:x:{group['gid']}:{','.join(members)}")
     
 with open('/etc/group', 'w') as fp:
-    fp.writelines(result)
+    fp.writelines([r + "\n" for r in result])
 
 known_groups = [v['name'] for v in data['groups']]
 
@@ -116,13 +114,13 @@ with open('/etc/gshadow', 'r') as fp:
 
         # only user groups, not system groups
         if groupname not in known_groups:
-            result.append(f'{groupname}:{passwd}:{admins}:{",".join(members)}')
+            result.append(f"{groupname}:{passwd}:{admins}:{','.join(members)}")
  
 for group in data['groups']:
     members = []
     if group['name'] in data['group_memberships']:
         members = data['group_memberships'][group['name']]
-    result.append(f'{group["name"]}:!::{",".join(members)}')
+    result.append(f"{group['name']}:!::{','.join(members)}")
     
 with open('/etc/gshadow', 'w') as fp:
-    fp.writelines(result)
+    fp.writelines([r + "\n" for r in result])
