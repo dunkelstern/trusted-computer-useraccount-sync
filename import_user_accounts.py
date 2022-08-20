@@ -54,7 +54,7 @@ with open('/etc/shadow', 'r') as fp:
 
 for user in data['shadow']:
     # only overwrite user if local password change is older than remote
-    if user['username'] in user_last_updated and user_last_updated[user['username']]['last_change'] <= user['last_change']:
+    if user['username'] not in user_last_updated or user_last_updated[user['username']]['last_change'] <= user['last_change']:
         result.append(f"{user['username']}:{user['password']}:{user['last_change']}:{user['min_days']}:{user['max_days']}:{user['warn_days']}:{user['inactive']}:{user['expire']}:")
     else:
         result.append(user_last_updated[user['username']]['line'])
