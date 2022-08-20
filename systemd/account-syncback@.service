@@ -5,7 +5,7 @@ Wants = network-online.target
 
 [Service]
 Type = oneshot
-ExecStart = /usr/bin/python /opt/trusted-computer-useraccount-sync/export_user_accounts.py | ssh login@%i /usr/bin/python /opt/trusted-computer-useraccount-sync/user_account_syncback.py
+ExecStart = /bin/bash -c '/usr/bin/python /opt/trusted-computer-useraccount-sync/export_user_accounts.py | ssh login@%i /usr/bin/python /opt/trusted-computer-useraccount-sync/user_account_syncback.py'
 
 [Install]
 WantedBy = multi-user.target
