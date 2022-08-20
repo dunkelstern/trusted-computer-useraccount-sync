@@ -32,6 +32,8 @@ known_users = [v['username'] for v in data['passwd']]
 # filter /etc/shadow
 #
 
+
+user_last_updated = {}
 result = []
 
 with open('/etc/shadow', 'r') as fp:
@@ -44,9 +46,18 @@ with open('/etc/shadow', 'r') as fp:
         # only include users with uid >= 1000 and username is not `nobody`
         if username not in known_users:
             result.append(f"{username}:{password_hash}:{last_change}:{min_days}:{max_days}:{warn_days}:{inactive_days}:{expire}:{flag}")
+        
+        user_last_updated[username] = {
+            'last_change': int(last_change),
+            'line': f"{username}:{password_hash}:{last_change}:{min_days}:{max_days}:{warn_days}:{inactive_days}:{expire}:{flag}"
+        }
 
 for user in data['shadow']:
-    result.append(f"{user['username']}:{user['password']}:{user['last_change']}:{user['min_days']}:{user['max_days']}:{user['warn_days']}:{user['inactive']}:{user['expire']}:")
+    # only overwrite user if local password change is older than remote
+    if user_last_updated[user['username']]['last_change'] <= user['last_change']:
+        result.append(f"{user['username']}:{user['password']}:{user['last_change']}:{user['min_days']}:{user['max_days']}:{user['warn_days']}:{user['inactive']}:{user['expire']}:")
+    else:
+        result.append(user_last_updated[user['username']]['line'])
 
 with open('/etc/shadow', 'w') as fp:
     fp.writelines([r + "\n" for r in result])
