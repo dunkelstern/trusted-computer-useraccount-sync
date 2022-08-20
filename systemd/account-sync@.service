@@ -1,0 +1,11 @@
+[Unit]
+Description = Sync user account changes to workstation %i
+After = network-online.target syslog.target
+Wants = network-online.target
+
+[Service]
+Type = oneshot
+ExecStart = /usr/bin/python cat /opt/trusted-computer-useraccount-sync/user_db.json | ssh login@%i /usr/bin/python /opt/trusted-computer-useraccount-sync/import_user_accounts.py
+
+[Install]
+WantedBy = multi-user.target
