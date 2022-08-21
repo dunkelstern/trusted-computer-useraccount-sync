@@ -46,7 +46,7 @@ for user in data['shadow']:
     # find user in db
     for u in database['shadow']:
         if user['username'] == u['username']:
-            if user['last_change'] >= u['last_change']:
+            if user['last_change'] >= u['last_change'] and user['password'] != u['password']:
                 # overwrite user
                 print(f'Changing password of user {user["username"]}')
                 u.update(user)
